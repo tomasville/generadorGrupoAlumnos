@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Generador de Grupos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f4f4f4;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    label, input {
+      display: block;
+      margin: 10px 0;
+    }
+
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .grupo {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #fff;
+      border-radius: 5px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>Generador de Grupos de Alumnos</h1>
+
+  <div id="step1">
+    <label for="cantidad">¿Cuántos alumnos hay?</label>
+    <input type="number" id="cantidad" min="1" />
+    <button onclick="generarCampos()">Continuar</button>
+  </div>
+
+  <form id="formNombres" style="display:none;">
+    <h2>Ingresa los nombres de los alumnos</h2>
+    <div id="camposNombres"></div>
+    <button type="submit">Generar Grupos</button>
+  </form>
+
+  <div id="resultado"></div>
+
+  <script>
+    function generarCampos() {
+      const cantidad = parseInt(document.getElementById("cantidad").value);
+      const contenedor = document.getElementById("camposNombres");
+      const form = document.getElementById("formNombres");
+
+      contenedor.innerHTML = ""; // limpia si ya había inputs
+      if (isNaN(cantidad) || cantidad < 1) {
+        alert("Ingresa un número válido.");
+        return;
+      }
+
+      for (let i = 0; i < cantidad; i++) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = `Alumno ${i + 1}`;
+        input.required = true;
+        input.name = "alumno";
+        contenedor.appendChild(input);
+      }
+
+      form.style.display = "block";
+    }
+
+    document.getElementById("formNombres").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const inputs = document.querySelectorAll('input[name="alumno"]');
+      const nombres = Array.from(inputs).map(input => input.value.trim()).filter(Boolean);
+
+      if (nombres.length !== inputs.length) {
+        alert("Por favor, completa todos los nombres.");
+        return;
+      }
+
+      // Mezcla aleatoria (Fisher-Yates)
+      for (let i = nombres.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [nombres[i], nombres[j]] = [nombres[j], nombres[i]];
+      }
+
+      const resultado = document.getElementById("resultado");
+      resultado.innerHTML = "<h2>Grupos Generados</h2>";
+
+      for (let i = 0; i < nombres.length; i += 2) {
+        if (i + 1 < nombres.length) {
+          resultado.innerHTML += `<div class="grupo">Grupo ${Math.floor(i/2) + 1}: ${nombres[i]} y ${nombres[i+1]}</div>`;
+        } else {
+          resultado.innerHTML += `<div class="grupo">Grupo ${Math.floor(i/2) + 1}: ${nombres[i]} (solo)</div>`;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
