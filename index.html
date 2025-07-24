@@ -2,128 +2,167 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Generador de Grupos</title>
+  <title>Generador de Grupos Personalizados</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
+      font-family: 'Lato', sans-serif;
+      max-width: 800px;
       margin: 40px auto;
       padding: 20px;
-      background-color: #f4f4f4;
+      background-color: #f4d8f7;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      color: #824988;
     }
 
     h1, h2 {
       text-align: center;
     }
 
-    label, input {
-      display: block;
-      margin: 10px 0;
+    .alumno-lista {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
     }
 
-    input[type="number"], input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
+    .grupo {
+      background-color: #fff;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     button {
-      margin-top: 15px;
       padding: 10px 20px;
       font-size: 16px;
-      background-color: #3498db;
+      background-color: #824988;
       color: white;
       border: none;
       cursor: pointer;
       border-radius: 5px;
+      margin-top: 10px;
     }
 
     button:hover {
-      background-color: #2980b9;
+      background-color: #ad6db4;
     }
 
-    .grupo {
-      margin-top: 10px;
-      padding: 10px;
-      background-color: #fff;
-      border-radius: 5px;
+    label {
+      display: flex;
+      align-items: center;
     }
 
+    input[type="number"] {
+      padding: 5px;
+      width: 60px;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Generador de Grupos de Alumnos</h1>
+  <h1>Generador de Grupos Personalizados</h1>
 
-  <div id="step1">
-    <label for="cantidad">¿Cuántos alumnos hay?</label>
-    <input type="number" id="cantidad" min="1" />
-    <button onclick="generarCampos()">Continuar</button>
-  </div>
+  <h2>Selecciona los alumnos presentes:</h2>
+  <form id="grupoForm">
+    <div class="alumno-lista" id="listaAlumnos"></div>
 
-  <form id="formNombres" style="display:none;">
-    <h2>Ingresa los nombres de los alumnos</h2>
-    <div id="camposNombres"></div>
+    <label for="tamGrupo">
+      Número de integrantes por grupo:
+      <input type="number" id="tamGrupo" min="1" value="2" required />
+    </label>
+
     <button type="submit">Generar Grupos</button>
   </form>
 
   <div id="resultado"></div>
 
   <script>
-    function generarCampos() {
-      const cantidad = parseInt(document.getElementById("cantidad").value);
-      const contenedor = document.getElementById("camposNombres");
-      const form = document.getElementById("formNombres");
+    const alumnos = [
+      "Agüero Máximo Fabricio",
+      "Agüero Natali Alahi",
+      "Aguilera Lautaro Valentino",
+      "Arrieta Ojeda Thiago Fernando",
+      "Arriola Herrera Briseida",
+      "Bessone Candela Agostina",
+      "Borgo Santino",
+      "Camargo Morena Abigail",
+      "Cuello Bryan Maximiliano",
+      "Fernandez Tatiana Ailén",
+      "Giuliana Godoy",
+      "Jara Agüero Catalina",
+      "Lacerda Tello Eusebio Gonzalo",
+      "Llambía Alexis Maximiliano",
+      "Molina Angel Gabriel",
+      "Molina Guadalupe",
+      "Muñoz Damaris Tais",
+      "Muñoz Dana María José",
+      "Olguin Figueroa, Ian",
+      "Pastrán Juliana",
+      "Pino Mia Morena",
+      "Poclaba Jazmin Marianela",
+      "Rivarola Eliel Benjamín",
+      "Rivero Bautista Emanuel",
+      "Rodriguez Jazmin",
+      "Salamonini Lara Andrea Martina",
+      "Sosa Toledo Justin Sebastian",
+      "Sosa Martina",
+      "Torres Betsabé Catalina Angelina",
+      "Urdiros Megillón Ezequías",
+      "Zarate Yasmin Ariadna"
+    ];
 
-      contenedor.innerHTML = ""; // limpia si ya había inputs
-      if (isNaN(cantidad) || cantidad < 1) {
-        alert("Ingresa un número válido.");
+    const listaContenedor = document.getElementById("listaAlumnos");
+    const resultado = document.getElementById("resultado");
+
+    // Genera los checkboxes
+    alumnos.forEach((nombre, index) => {
+      const label = document.createElement("label");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.name = "alumno";
+      checkbox.value = nombre;
+      label.appendChild(checkbox);
+      label.append(" " + nombre);
+      listaContenedor.appendChild(label);
+    });
+
+    // Manejar generación de grupos
+    document.getElementById("grupoForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      resultado.innerHTML = "";
+
+      const seleccionados = Array.from(document.querySelectorAll('input[name="alumno"]:checked')).map(el => el.value);
+      const tamGrupo = parseInt(document.getElementById("tamGrupo").value);
+
+      if (seleccionados.length < 1 || isNaN(tamGrupo) || tamGrupo < 1) {
+        alert("Selecciona al menos un alumno y un tamaño válido de grupo.");
         return;
       }
 
-      for (let i = 0; i < cantidad; i++) {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.placeholder = `Alumno ${i + 1}`;
-        input.required = true;
-        input.name = "alumno";
-        contenedor.appendChild(input);
-      }
-
-      form.style.display = "block";
-    }
-
-    document.getElementById("formNombres").addEventListener("submit", function(event) {
-      event.preventDefault();
-
-      const inputs = document.querySelectorAll('input[name="alumno"]');
-      const nombres = Array.from(inputs).map(input => input.value.trim()).filter(Boolean);
-
-      if (nombres.length !== inputs.length) {
-        alert("Por favor, completa todos los nombres.");
-        return;
-      }
-
-      // Mezcla aleatoria (Fisher-Yates)
-      for (let i = nombres.length - 1; i > 0; i--) {
+      // Mezclar los alumnos seleccionados
+      for (let i = seleccionados.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [nombres[i], nombres[j]] = [nombres[j], nombres[i]];
+        [seleccionados[i], seleccionados[j]] = [seleccionados[j], seleccionados[i]];
       }
 
-      const resultado = document.getElementById("resultado");
+      // Dividir en grupos
+      const grupos = [];
+      for (let i = 0; i < seleccionados.length; i += tamGrupo) {
+        grupos.push(seleccionados.slice(i, i + tamGrupo));
+      }
+
       resultado.innerHTML = "<h2>Grupos Generados</h2>";
-
-      for (let i = 0; i < nombres.length; i += 2) {
-        if (i + 1 < nombres.length) {
-          resultado.innerHTML += `<div class="grupo">Grupo ${Math.floor(i/2) + 1}: ${nombres[i]} y ${nombres[i+1]}</div>`;
-        } else {
-          resultado.innerHTML += `<div class="grupo">Grupo ${Math.floor(i/2) + 1}: ${nombres[i]} (solo)</div>`;
-        }
-      }
+      grupos.forEach((grupo, idx) => {
+        resultado.innerHTML += `<div class="grupo"><strong>Grupo ${idx + 1}:</strong> ${grupo.join(", ")}</div>`;
+      });
     });
   </script>
+
 </body>
 </html>
